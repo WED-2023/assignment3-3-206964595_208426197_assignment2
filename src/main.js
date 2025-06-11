@@ -61,3 +61,4 @@ app.config.globalProperties.toast = function (title, content, variant = null, ap
 };
 
 app.mount('#app');
+//CHIGG CHECK
