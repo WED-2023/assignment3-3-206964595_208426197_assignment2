@@ -5,18 +5,12 @@
       <div class="form-group">
         <label>Username:</label>
         <input v-model="state.username" type="text" class="form-control" />
-        <div v-if="v$.username.$error" class="text-danger">
-          Username is required.
-        </div>
       </div>
       <div class="form-group">
         <label>Password:</label>
         <input v-model="state.password" type="password" class="form-control" />
-        <div v-if="v$.password.$error" class="text-danger">
-          Password is required (at least 6 characters).
-        </div>
       </div>
-      <button type="submit" class="btn btn-primary mt-3">Login</button>
+      <button type="submit" class="btn btn-success mt-3">Login</button>
     </form>
   </div>
 </template>
@@ -24,7 +18,11 @@
 <script>
 import { reactive } from 'vue';
 import { useVuelidate } from '@vuelidate/core';
-import { required, minLength } from '@vuelidate/validators';
+import { required } from '@vuelidate/validators';
+import store from '../store'
+import axios from 'axios';
+
+const server_domain = store.server_domain;
 
 export default {
   name: "LoginPage",
@@ -36,27 +34,34 @@ export default {
 
     const rules = {
       username: { required },
-      password: { required, minLength: minLength(6) },
+      password: { required},
     };
 
     const v$ = useVuelidate(rules, state);
 
-    const login = async () => {
-      if (await v$.value.$validate()) {
-        // קריאה לשרת
-        try {
-          await window.axios.post('/login', {
-            username: state.username,
-            password: state.password
-          });
-          window.store.login(state.username);
-          window.router.push('/main');
-        } catch (err) {
-          window.toast("Login failed", err.response.data.message, "danger");
-        }
+const login = async () => {
+  if (await v$.value.$validate()) {
+    const response = await axios({
+      method: "POST",
+      url: server_domain + "/login",
+      withCredentials: true,
+      validateStatus: () => true,
+      data: {
+        username: state.username,
+        password: state.password,
       }
-    };
+    });
 
+    if (response.status === 200) {
+      store.login(state.username);
+      window.location.href = "/";
+    } else {
+      window.toast("Login failed", response.data.message || "Unknown error", "danger");
+    }
+  }
+};
+
+    
     expose({ login });
 
     return { state, v$, login };
@@ -68,5 +73,9 @@ export default {
 .login-page {
   max-width: 400px;
   margin: auto;
+}
+
+.login-page h1 {
+  text-align: center;
 }
 </style>
