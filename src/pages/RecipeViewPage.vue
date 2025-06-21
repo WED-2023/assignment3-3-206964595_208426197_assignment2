@@ -56,10 +56,8 @@
         try {
           response = await this.axios.get(
             // "https://test-for-3-2.herokuapp.com/recipes/info",
-            this.$root.store.server_domain + "/recipes/info",
-            {
-              params: { id: this.$route.params.recipeId }
-            }
+             `${this.$root.store.server_domain}/recipes/${this.$route.params.recipeId}`
+
           );
   
           // console.log("response.status", response.status);
@@ -78,7 +76,7 @@
           readyInMinutes,
           image,
           title
-        } = response.data.recipe;
+        } = response.data;
   
         let _instructions = analyzedInstructions
           .map((fstep) => {

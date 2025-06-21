@@ -1,9 +1,5 @@
 <template>
   <b-container>
-    <h3>
-      {{ title }}:
-      <slot></slot>
-    </h3>
     <b-row>
       <b-col v-for="r in recipes" :key="r.id">
         <RecipePreview class="recipePreview" :recipe="r" />
@@ -42,7 +38,7 @@ export default {
             params: {
               limitLicense: true,
               number: 3,
-              apiKey: 'b7b147413c244375812ccb826d79cdcc'
+              apiKey: '8ff080815b204f66a9641b65189504ee'
             }
           }
         );

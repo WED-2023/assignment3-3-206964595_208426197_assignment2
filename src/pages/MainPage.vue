@@ -1,54 +1,62 @@
 <template>
-  <div class="container">
-    <h1 class="title">Main Page</h1>
-
-    <RecipePreviewList title="Random Recipes" class="RandomRecipes center" />
-
-    <div v-if="!store.username" class="text-center mt-4">
-      <router-link :to="{ name: 'login' }">
-        <button class="btn btn-primary">You need to Login to view this</button>
-      </router-link>
+  <div class="main-container">
+    <div class="left-panel">
+      <h2>Explore new recipes</h2>
+      <RecipePreviewList :recipes="exploreRecipes" />
+      <button @click="loadRandomRecipes">Load More</button>
     </div>
-
-    <RecipePreviewList
-      title="Last Viewed Recipes"
-      :class="{
-        RandomRecipes: true,
-        blur: !store.username,
-        center: true
-      }"
-      disabled
-    />
+    <div class="right-panel">
+      <RightPanel />
+    </div>
+  </div>
+  <div>
+    <button class="btn btn-primary" @click="openCreateRecipe">Open Create Recipe</button>
+    <CreateNewRecipe ref="createModal" />
   </div>
 </template>
 
 <script>
-import { getCurrentInstance } from 'vue';
-import RecipePreviewList from "../components/RecipePreviewList.vue";
+import RecipePreviewList from '../components/RecipePreviewList.vue'
+import RightPanel from '../components/RightPanel.vue'
+import CreateNewRecipe from "../components/CreateNewRecipe.vue";
+
 
 export default {
-  components: {
-    RecipePreviewList
+  components: { RecipePreviewList, RightPanel,CreateNewRecipe},
+  data() {
+    return {
+      exploreRecipes: []
+    };
   },
-  setup() {
-    const internalInstance = getCurrentInstance();
-    const store = internalInstance.appContext.config.globalProperties.store;
-
-    return { store };
+  async mounted() {
+    await this.loadRandomRecipes();
+  },
+  methods: {
+    async loadRandomRecipes() {
+      try {
+        const response = await this.axios.get("http://localhost:3000/recipes/explore", { withCredentials: true });
+        this.exploreRecipes = response.data;
+      } catch (err) {
+        console.error("Failed to load recipes");
+      }
+    },
+    openCreateRecipe() {
+    this.$refs.createModal.showModal();
+  }
   }
 };
 </script>
 
-<style lang="scss" scoped>
-.RandomRecipes {
-  margin: 10px 0 10px;
+<style scoped>
+.main-container {
+  display: flex;
 }
-.blur {
-  -webkit-filter: blur(5px); /* Safari 6.0 - 9.0 */
-  filter: blur(2px);
+.left-panel {
+  flex: 3;
+  margin-right: 20px;
+  margin-left: 20px;
 }
-::v-deep .blur .recipe-preview {
-  pointer-events: none;
-  cursor: default;
+.right-panel {
+  flex: 3;
 }
 </style>
