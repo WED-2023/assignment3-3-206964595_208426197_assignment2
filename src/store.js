@@ -1,4 +1,9 @@
 import { reactive } from 'vue';
+import {
+  getMyRecipes,
+  getFavoriteRecipes,
+  getLastWatchedRecipes
+} from "@/api/apiHelper";
 
 const store = reactive({
   username: localStorage.getItem('username'),
@@ -14,6 +19,19 @@ const store = reactive({
     console.log("logout");
     localStorage.removeItem('username');
     this.username = undefined;
+  },
+
+  // API 
+  async getMyRecipes() {
+    return await getMyRecipes();
+  },
+
+  async getFavoriteRecipes() {
+    return await getFavoriteRecipes();
+  },
+
+  async getWatchedRecipes() {
+    return await getLastWatchedRecipes();
   }
 });
 
