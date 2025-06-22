@@ -133,6 +133,7 @@ export default {
 
     // Enable bootstrap dropdowns
     onMounted(() => {
+      // Bootstrap dropdown init
       const dropdownTriggers = document.querySelectorAll('[data-bs-toggle="dropdown"]');
       dropdownTriggers.forEach(el => {
         new bootstrap.Dropdown(el);
@@ -145,6 +146,10 @@ export default {
           store.login(savedUsername);
         }
       }
+<<<<<<< HEAD:src/components/NavBar.vue
+=======
+      dropdownTriggers.forEach(el => new bootstrap.Dropdown(el));
+>>>>>>> 1f4a5e470d08a6115bd6edb278a65ab2e835bf20:src/components/Navbar.vue
     });
 
     return {
@@ -158,6 +163,7 @@ export default {
   }
 };
 </script>
+
 
 <style scoped>
 .navbar {
