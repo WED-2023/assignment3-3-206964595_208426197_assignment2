@@ -74,22 +74,33 @@ export default {
 
     const logout = () => {
       store.logout();
+      localStorage.removeItem("isLoggedIn");
+      localStorage.removeItem("username");
       toast('Logout', 'User logged out successfully', 'success');
       router.push('/').catch(() => {});
     };
 
-    // אתחול dropdown עם Bootstrap
     onMounted(() => {
+      // Bootstrap dropdown init
       const dropdownTriggers = document.querySelectorAll('[data-bs-toggle="dropdown"]');
       dropdownTriggers.forEach(el => {
         new bootstrap.Dropdown(el);
       });
+
+      // Auto-login if still marked as logged in
+      if (localStorage.getItem("isLoggedIn") === "true" && !store.username) {
+        const savedUsername = localStorage.getItem("username");
+        if (savedUsername) {
+          store.login(savedUsername);
+        }
+      }
     });
 
     return { store, logout };
   }
 };
 </script>
+
 
 <style scoped>
 .navbar {
