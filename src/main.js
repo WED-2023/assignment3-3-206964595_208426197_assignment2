@@ -7,6 +7,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/js/bootstrap.bundle.js';
+
 //test
 
 import BootstrapVue3 from 'bootstrap-vue-3';
