@@ -145,6 +145,7 @@ export default {
           store.login(savedUsername);
         }
       }
+      dropdownTriggers.forEach(el => new bootstrap.Dropdown(el));
     });
 
     return {
