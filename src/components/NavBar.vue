@@ -12,9 +12,11 @@
       <li class="nav-item">
         <router-link class="nav-link" :to="{ name: 'about' }">About</router-link>
       </li>
-      <li class="nav-item">
-        <a href="#" class="nav-link" @click.prevent="openCreateRecipe">Create Recipe</a>
-      </li>
+      <template v-if="store.username">
+        <li class="nav-item">
+          <a href="#" class="nav-link" @click.prevent="handleCreateClick">Create Recipe</a>
+        </li>
+      </template>
     </ul>
 
     <ul class="navbar-nav ms-auto">
@@ -85,12 +87,12 @@
 <script>
 import { getCurrentInstance, onMounted, ref } from 'vue';
 import * as bootstrap from 'bootstrap';
-import CreateRecipe from '@/components/CreateRecipe.vue'; 
+import CreateRecipe from '@/components/CreateRecipe.vue';
 
 export default {
   name: 'NavBar',
-  components: { 
-    CreateRecipe // Add this component
+  components: {
+    CreateRecipe
   },
   setup() {
     const modalRef = ref(null);
@@ -103,16 +105,25 @@ export default {
 
     const logout = () => {
       store.logout();
+      localStorage.removeItem("isLoggedIn");
+      localStorage.removeItem("username");
       toast('Logout', 'User logged out successfully', 'success');
       router.push('/').catch(() => {});
     };
 
     const openCreateRecipe = () => {
-      console.log('Opening create recipe modal'); // Debug log
       if (!modalInstance && modalRef.value) {
         modalInstance = new bootstrap.Modal(modalRef.value);
       }
       modalInstance?.show();
+    };
+
+    const handleCreateClick = () => {
+      if (!store.username) {
+        toast('Access Denied', 'You must be logged in to create a recipe.', 'danger');
+        return;
+      }
+      openCreateRecipe();
     };
 
     const onRecipeCreated = () => {
@@ -123,13 +134,24 @@ export default {
     // Enable bootstrap dropdowns
     onMounted(() => {
       const dropdownTriggers = document.querySelectorAll('[data-bs-toggle="dropdown"]');
-      dropdownTriggers.forEach(el => new bootstrap.Dropdown(el));
+      dropdownTriggers.forEach(el => {
+        new bootstrap.Dropdown(el);
+      });
+
+      // Auto-login if still marked as logged in
+      if (localStorage.getItem("isLoggedIn") === "true" && !store.username) {
+        const savedUsername = localStorage.getItem("username");
+        if (savedUsername) {
+          store.login(savedUsername);
+        }
+      }
     });
 
     return {
       store,
       logout,
       openCreateRecipe,
+      handleCreateClick,
       modalRef,
       onRecipeCreated
     };

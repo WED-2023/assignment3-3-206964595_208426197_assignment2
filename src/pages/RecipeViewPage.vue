@@ -87,9 +87,32 @@ export default {
         `${this.$root.store.server_domain}/recipes/${this.$route.params.recipeId}`
       );
       this.recipe = response.data;
+      
+      // Mark as watched when user views the recipe
+      await this.markAsWatched();
     } catch (error) {
       console.error(error);
       this.$router.push('/NotFound');
+    }
+  },
+  methods: {
+    async markAsWatched() {
+      // Only mark as watched if user is logged in
+      if (!this.$root.store.username) {
+        return;
+      }
+      
+      try {
+        await this.axios.post(
+          `${this.$root.store.server_domain}/users/markwatched/${this.recipe.id}`,
+          {},
+          { withCredentials: true }
+        );
+        console.log('Recipe marked as watched');
+      } catch (error) {
+        console.error('Error marking recipe as watched:', error);
+        // Don't show error to user, this is background functionality
+      }
     }
   }
 };
