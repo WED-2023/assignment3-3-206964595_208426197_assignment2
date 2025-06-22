@@ -13,7 +13,7 @@
         <router-link class="nav-link" :to="{ name: 'about' }">About</router-link>
       </li>
       <li class="nav-item">
-        <router-link class="nav-link" :to="{ name: 'createRecipe' }">Create Recipe</router-link>
+        <a href="#" class="nav-link" @click.prevent="openCreateRecipe">Create Recipe</a>
       </li>
     </ul>
 
@@ -58,15 +58,44 @@
       </template>
     </ul>
   </nav>
+
+  <!-- Create Recipe Modal -->
+  <div
+    class="modal fade"
+    id="createRecipeModal"
+    tabindex="-1"
+    aria-labelledby="createRecipeModalLabel"
+    aria-hidden="true"
+    ref="modalRef"
+  >
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="createRecipeModalLabel">Create New Recipe</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <CreateRecipe @recipeCreated="onRecipeCreated" />
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
-import { getCurrentInstance, onMounted } from 'vue';
+import { getCurrentInstance, onMounted, ref } from 'vue';
 import * as bootstrap from 'bootstrap';
+import CreateRecipe from '@/components/CreateRecipe.vue'; 
 
 export default {
   name: 'NavBar',
+  components: { 
+    CreateRecipe // Add this component
+  },
   setup() {
+    const modalRef = ref(null);
+    let modalInstance = null;
+
     const internalInstance = getCurrentInstance();
     const store = internalInstance.appContext.config.globalProperties.store;
     const toast = internalInstance.appContext.config.globalProperties.toast;
@@ -78,15 +107,32 @@ export default {
       router.push('/').catch(() => {});
     };
 
-    // אתחול dropdown עם Bootstrap
+    const openCreateRecipe = () => {
+      console.log('Opening create recipe modal'); // Debug log
+      if (!modalInstance && modalRef.value) {
+        modalInstance = new bootstrap.Modal(modalRef.value);
+      }
+      modalInstance?.show();
+    };
+
+    const onRecipeCreated = () => {
+      toast('Success', 'Recipe created successfully!', 'success');
+      modalInstance?.hide();
+    };
+
+    // Enable bootstrap dropdowns
     onMounted(() => {
       const dropdownTriggers = document.querySelectorAll('[data-bs-toggle="dropdown"]');
-      dropdownTriggers.forEach(el => {
-        new bootstrap.Dropdown(el);
-      });
+      dropdownTriggers.forEach(el => new bootstrap.Dropdown(el));
     });
 
-    return { store, logout };
+    return {
+      store,
+      logout,
+      openCreateRecipe,
+      modalRef,
+      onRecipeCreated
+    };
   }
 };
 </script>

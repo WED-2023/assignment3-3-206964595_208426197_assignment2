@@ -1,124 +1,130 @@
 <template>
-    <div class="container">
-      <div v-if="recipe">
-        <div class="recipe-header mt-3 mb-4">
-          <h1>{{ recipe.title }}</h1>
-          <img :src="recipe.image" class="center" />
+  <div class="container mt-4">
+    <div v-if="recipe">
+      <!-- Recipe Header -->
+      <h1>{{ recipe.title }}</h1>
+      <img v-if="recipe.image" :src="recipe.image" class="recipe-image" />
+      
+      <!-- Basic Info -->
+      <div class="recipe-info">
+        <p><strong>Ready in:</strong> {{ recipe.readyInMinutes }} minutes</p>
+        <p><strong>Likes:</strong> {{ recipe.aggregateLikes || recipe.popularity || 0 }}</p>
+      </div>
+
+      <div class="recipe-content">
+        <!-- Ingredients -->
+        <div class="section">
+          <h3>Ingredients:</h3>
+          <ul>
+            <li v-for="ingredient in displayIngredients" :key="ingredient">
+              {{ ingredient }}
+            </li>
+          </ul>
         </div>
-        <div class="recipe-body">
-          <div class="wrapper">
-            <div class="wrapped">
-              <div class="mb-3">
-                <div>Ready in {{ recipe.readyInMinutes }} minutes</div>
-                <div>Likes: {{ recipe.aggregateLikes }} likes</div>
-              </div>
-              Ingredients:
-              <ul>
-                <li
-                  v-for="(r, index) in recipe.extendedIngredients"
-                  :key="index + '_' + r.id"
-                >
-                  {{ r.original }}
-                </li>
-              </ul>
-            </div>
-            <div class="wrapped">
-              Instructions:
-              <ol>
-                <li v-for="s in recipe._instructions" :key="s.number">
-                  {{ s.step }}
-                </li>
-              </ol>
-            </div>
+
+        <!-- Instructions -->
+        <div class="section">
+          <h3>Instructions:</h3>
+          <div v-if="displayInstructions">
+            {{ displayInstructions }}
           </div>
         </div>
-        <!-- <pre>
-        {{ $route.params }}
-        {{ recipe }}
-      </pre
-        > -->
       </div>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    data() {
-      return {
-        recipe: null
-      };
-    },
-    async created() {
-      try {
-        let response;
-        // response = this.$route.params.response;
-  
-        try {
-          response = await this.axios.get(
-            // "https://test-for-3-2.herokuapp.com/recipes/info",
-             `${this.$root.store.server_domain}/recipes/${this.$route.params.recipeId}`
+    
+    <div v-else>
+      <p>Loading...</p>
+    </div>
+  </div>
+</template>
 
-          );
-  
-          // console.log("response.status", response.status);
-          if (response.status !== 200) this.$router.replace("/NotFound");
-        } catch (error) {
-          console.log("error.response.status", error.response.status);
-          this.$router.replace("/NotFound");
-          return;
-        }
-  
-        let {
-          analyzedInstructions,
-          instructions,
-          extendedIngredients,
-          aggregateLikes,
-          readyInMinutes,
-          image,
-          title
-        } = response.data;
-  
-        let _instructions = analyzedInstructions
-          .map((fstep) => {
-            fstep.steps[0].step = fstep.name + fstep.steps[0].step;
-            return fstep.steps;
-          })
-          .reduce((a, b) => [...a, ...b], []);
-  
-        let _recipe = {
-          instructions,
-          _instructions,
-          analyzedInstructions,
-          extendedIngredients,
-          aggregateLikes,
-          readyInMinutes,
-          image,
-          title
-        };
-  
-        this.recipe = _recipe;
-      } catch (error) {
-        console.log(error);
+<script>
+export default {
+  data() {
+    return {
+      recipe: null
+    };
+  },
+  computed: {
+    displayIngredients() {
+      if (!this.recipe) return [];
+      
+      // Spoonacular format
+      if (this.recipe.extendedIngredients) {
+        return this.recipe.extendedIngredients.map(ing => ing.original);
       }
+      
+      // Custom format
+      if (this.recipe.ingredients) {
+        return this.recipe.ingredients.map(ing => {
+          return `${ing.amount || ''} ${ing.unit || ''} ${ing.name || ''}`.trim();
+        });
+      }
+      
+      return [];
+    },
+    
+    displayInstructions() {
+      if (!this.recipe) return '';
+      
+      // Spoonacular format
+      if (this.recipe.analyzedInstructions && this.recipe.analyzedInstructions.length) {
+        const steps = this.recipe.analyzedInstructions
+          .map(section => section.steps || [])
+          .flat()
+          .map(step => step.step)
+          .join(' ');
+        return steps;
+      }
+      
+      // Custom format
+      return this.recipe.instructions || '';
     }
-  };
-  </script>
-  
-  <style scoped>
-  .wrapper {
-    display: flex;
+  },
+  async created() {
+    try {
+      const response = await this.axios.get(
+        `${this.$root.store.server_domain}/recipes/${this.$route.params.recipeId}`
+      );
+      this.recipe = response.data;
+    } catch (error) {
+      console.error(error);
+      this.$router.push('/NotFound');
+    }
   }
-  .wrapped {
-    width: 50%;
+};
+</script>
+
+<style scoped>
+.recipe-image {
+  width: 100%;
+  max-width: 400px;
+  margin: 20px 0;
+}
+
+.recipe-info {
+  background: #f5f5f5;
+  padding: 15px;
+  margin: 20px 0;
+}
+
+.recipe-content {
+  display: flex;
+  gap: 30px;
+}
+
+.section {
+  flex: 1;
+}
+
+.section h3 {
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+  .recipe-content {
+    flex-direction: column;
   }
-  .center {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    width: 50%;
-  }
-  /* .recipe-header{
-  
-  } */
-  </style>
-  
+}
+</style>

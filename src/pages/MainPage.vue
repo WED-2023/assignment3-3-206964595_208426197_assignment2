@@ -9,20 +9,15 @@
       <RightPanel />
     </div>
   </div>
-  <div>
-    <button class="btn btn-primary" @click="openCreateRecipe">Open Create Recipe</button>
-    <CreateNewRecipe ref="createModal" />
-  </div>
 </template>
 
 <script>
 import RecipePreviewList from '../components/RecipePreviewList.vue'
 import RightPanel from '../components/RightPanel.vue'
-import CreateNewRecipe from "../components/CreateNewRecipe.vue";
 
 
 export default {
-  components: { RecipePreviewList, RightPanel,CreateNewRecipe},
+  components: { RecipePreviewList, RightPanel},
   data() {
     return {
       exploreRecipes: []
@@ -39,11 +34,8 @@ export default {
       } catch (err) {
         console.error("Failed to load recipes");
       }
-    },
-    openCreateRecipe() {
-    this.$refs.createModal.showModal();
   }
-  }
+}
 };
 </script>
 
