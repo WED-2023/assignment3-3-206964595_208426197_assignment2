@@ -1,442 +1,484 @@
 <template>
-  <nav class="modern-navbar">
-    <div class="navbar-container">
-      <!-- Brand -->
-      <router-link class="navbar-brand" :to="{ name: 'main' }">
-        <i class="fas fa-utensils brand-icon"></i>
-        <span class="brand-text">Vue Recipes</span>
-      </router-link>
+  <nav class="modern-navbar navbar navbar-expand-lg px-3">
+    <router-link class="navbar-brand" :to="{ name: 'main' }">
+      <i class="fas fa-utensils brand-icon"></i>
+      Vue Recipes
+    </router-link>
 
-      <!-- Navigation Links -->
-      <div class="nav-links">
-        <router-link class="nav-link" :to="{ name: 'main' }">
-          <i class="fas fa-home"></i>
-          <span>Home</span>
-        </router-link>
-        <router-link class="nav-link" :to="{ name: 'search' }">
-          <i class="fas fa-search"></i>
-          <span>Search</span>
-        </router-link>
-        <router-link class="nav-link" :to="{ name: 'about' }">
-          <i class="fas fa-info-circle"></i>
-          <span>About</span>
-        </router-link>
-        <a href="#" class="nav-link create-btn" @click.prevent="openCreateRecipe">
-          <i class="fas fa-plus"></i>
-          <span>Create Recipe</span>
-        </a>
-      </div>
+    <!-- Mobile toggle button -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-      <!-- User Section -->
-      <div class="user-section">
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <router-link class="nav-link" :to="{ name: 'main' }">
+            <i class="fas fa-home"></i>
+            Recipes
+          </router-link>
+        </li>
+        <li class="nav-item">
+          <router-link class="nav-link" :to="{ name: 'search' }">
+            <i class="fas fa-search"></i>
+            Search
+          </router-link>
+        </li>
+        <li class="nav-item">
+          <router-link class="nav-link" :to="{ name: 'about' }">
+            <i class="fas fa-info-circle"></i>
+            About
+          </router-link>
+        </li>
+        <template v-if="store.username">
+          <li class="nav-item">
+            <a href="#" class="nav-link" @click.prevent="handleCreateClick">
+              <i class="fas fa-plus"></i>
+              Create Recipe
+            </a>
+          </li>
+        </template>
+      </ul>
+
+      <ul class="navbar-nav ms-auto">
         <template v-if="!store.username">
-          <router-link class="auth-btn login-btn" :to="{ name: 'login' }">Login</router-link>
-          <router-link class="auth-btn register-btn" :to="{ name: 'register' }">Register</router-link>
+          <li class="nav-item">
+            <span class="navbar-text welcome-text">
+              <i class="fas fa-user-circle"></i>
+              Hello Guest
+            </span>
+          </li>
+          <li class="nav-item">
+            <router-link class="nav-link login-btn" :to="{ name: 'login' }">
+              <i class="fas fa-sign-in-alt"></i>
+              Login
+            </router-link>
+          </li>
+          <li class="nav-item">
+            <router-link class="nav-link register-btn" :to="{ name: 'register' }">
+              <i class="fas fa-user-plus"></i>
+              Register
+            </router-link>
+          </li>
         </template>
 
         <template v-else>
-          <div class="user-menu" ref="userMenu">
-            <button class="user-btn" @click="toggleUserDropdown">
-              <i class="fas fa-user"></i>
-              <span>{{ store.username }}</span>
-              <i class="fas fa-chevron-down" :class="{ 'rotated': showUserDropdown }"></i>
+          <li class="nav-item dropdown user-dropdown">
+            <a
+              class="nav-link dropdown-toggle user-menu-btn"
+              href="#"
+              id="personalArea"
+              role="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i class="fas fa-user-circle"></i>
+              {{ store.username }}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end modern-dropdown" aria-labelledby="personalArea">
+              <li>
+                <router-link class="dropdown-item" :to="{ name: 'favorites' }">
+                  <i class="fas fa-heart text-danger"></i>
+                  My Favorite Recipes
+                </router-link>
+              </li>
+              <li>
+                <router-link class="dropdown-item" :to="{ name: 'myRecipes' }">
+                  <i class="fas fa-book text-primary"></i>
+                  My Recipes
+                </router-link>
+              </li>
+              <li>
+                <router-link class="dropdown-item" :to="{ name: 'familyRecipes' }">
+                  <i class="fas fa-users text-success"></i>
+                  My Family Recipes
+                </router-link>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <button @click="logout" class="btn logout-btn nav-link">
+              <i class="fas fa-sign-out-alt"></i>
+              Logout
             </button>
-            
-            <div class="dropdown" v-show="showUserDropdown">
-              <router-link class="dropdown-item" :to="{ name: 'favorites' }" @click="closeDropdown">
-                <i class="fas fa-heart"></i>
-                My Favorites
-              </router-link>
-              <router-link class="dropdown-item" :to="{ name: 'myRecipes' }" @click="closeDropdown">
-                <i class="fas fa-book"></i>
-                My Recipes
-              </router-link>
-              <router-link class="dropdown-item" :to="{ name: 'familyRecipes' }" @click="closeDropdown">
-                <i class="fas fa-users"></i>
-                Family Recipes
-              </router-link>
-            </div>
-          </div>
-          
-          <!-- Separator -->
-          <div class="separator"></div>
-          
-          <!-- Logout Button -->
-          <button class="logout-btn" @click="logout">
-            <i class="fas fa-sign-out-alt"></i>
-            <span>Logout</span>
-          </button>
+          </li>
         </template>
-      </div>
+      </ul>
     </div>
+  </nav>
 
-    <!-- Simple Modal -->
-    <div v-if="showModal" class="modal-overlay" @click="closeModal">
-      <div class="modal" @click.stop>
-        <div class="modal-header">
-          <h3>Create New Recipe</h3>
-          <button class="close-btn" @click="closeModal">×</button>
+  <!-- Enhanced Create Recipe Modal -->
+  <div
+    class="modal fade"
+    id="createRecipeModal"
+    tabindex="-1"
+    aria-labelledby="createRecipeModalLabel"
+    aria-hidden="true"
+    ref="modalRef"
+  >
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content modern-modal">
+        <div class="modal-header gradient-header">
+          <h5 class="modal-title" id="createRecipeModalLabel">
+            <i class="fas fa-plus-circle"></i>
+            Create New Recipe
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <CreateRecipe @recipeCreated="onRecipeCreated" />
         </div>
       </div>
     </div>
-  </nav>
+  </div>
 </template>
 
 <script>
-import { getCurrentInstance, ref, onMounted, onUnmounted } from 'vue';
+import { getCurrentInstance, onMounted, ref } from 'vue';
+import * as bootstrap from 'bootstrap';
 import CreateRecipe from '@/components/CreateRecipe.vue';
 
 export default {
   name: 'NavBar',
-  components: { CreateRecipe },
+  components: {
+    CreateRecipe
+  },
   setup() {
-    const userMenu = ref(null);
-    const showUserDropdown = ref(false);
-    const showModal = ref(false);
+    const modalRef = ref(null);
+    let modalInstance = null;
 
     const internalInstance = getCurrentInstance();
     const store = internalInstance.appContext.config.globalProperties.store;
     const toast = internalInstance.appContext.config.globalProperties.toast;
     const router = internalInstance.appContext.config.globalProperties.$router;
 
-    const toggleUserDropdown = () => {
-      showUserDropdown.value = !showUserDropdown.value;
-    };
-
-    const closeDropdown = () => {
-      showUserDropdown.value = false;
+    const logout = () => {
+      store.logout();
+      localStorage.removeItem("isLoggedIn");
+      localStorage.removeItem("username");
+      toast('Logout', 'User logged out successfully', 'success');
+      router.push('/').catch(() => {});
     };
 
     const openCreateRecipe = () => {
-      showModal.value = true;
+      if (!modalInstance && modalRef.value) {
+        modalInstance = new bootstrap.Modal(modalRef.value);
+      }
+      modalInstance?.show();
     };
 
-    const closeModal = () => {
-      showModal.value = false;
+    const handleCreateClick = () => {
+      if (!store.username) {
+        toast('Access Denied', 'You must be logged in to create a recipe.', 'danger');
+        return;
+      }
+      openCreateRecipe();
     };
 
     const onRecipeCreated = () => {
       toast('Success', 'Recipe created successfully!', 'success');
-      closeModal();
+      modalInstance?.hide();
     };
 
-    const logout = () => {
-      store.logout();
-      toast('Success', 'Logged out successfully', 'success');
-      router.push('/').catch(() => {});
-      closeDropdown();
-    };
-
-    // Close dropdown when clicking outside
-    const handleClickOutside = (event) => {
-      if (userMenu.value && !userMenu.value.contains(event.target)) {
-        closeDropdown();
-      }
-    };
-
+    // Enable bootstrap dropdowns
     onMounted(() => {
-      document.addEventListener('click', handleClickOutside);
-    });
+      const dropdownTriggers = document.querySelectorAll('[data-bs-toggle="dropdown"]');
+      dropdownTriggers.forEach(el => {
+        new bootstrap.Dropdown(el);
+      });
 
-    onUnmounted(() => {
-      document.removeEventListener('click', handleClickOutside);
+      // Auto-login if still marked as logged in
+      if (localStorage.getItem("isLoggedIn") === "true" && !store.username) {
+        const savedUsername = localStorage.getItem("username");
+        if (savedUsername) {
+          store.login(savedUsername);
+        }
+      }
+      dropdownTriggers.forEach(el => new bootstrap.Dropdown(el));
     });
 
     return {
       store,
-      userMenu,
-      showUserDropdown,
-      showModal,
-      toggleUserDropdown,
-      closeDropdown,
+      logout,
       openCreateRecipe,
-      closeModal,
-      onRecipeCreated,
-      logout
+      handleCreateClick,
+      modalRef,
+      onRecipeCreated
     };
   }
 };
 </script>
 
 <style scoped>
+/* Modern Navbar Styling */
 .modern-navbar {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+  backdrop-filter: blur(10px);
+  border: none;
+  padding: 0.8rem 1.5rem;
+  position: relative;
+  z-index: 1030;
 }
 
-.navbar-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-  height: 65px;
+/* Mobile toggle button */
+.navbar-toggler {
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 4px 8px;
 }
 
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.9%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+.navbar-toggler:focus {
+  box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.25);
+}
 .navbar-brand {
+  color: white !important;
+  font-weight: 700;
+  font-size: 1.5rem;
   display: flex;
   align-items: center;
   gap: 10px;
-  color: white;
   text-decoration: none;
-  font-weight: 700;
-  font-size: 1.4rem;
-  margin-right: 40px;
+  transition: all 0.3s ease;
+}
+
+.navbar-brand:hover {
+  color: #f8f9fa !important;
+  transform: translateY(-1px);
 }
 
 .brand-icon {
-  font-size: 1.5rem;
+  font-size: 1.6rem;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 8px;
+  border-radius: 50%;
+  backdrop-filter: blur(10px);
 }
 
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 30px;
-}
-
+/* Navigation Links */
 .nav-link {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: rgba(255, 255, 255, 0.9);
-  text-decoration: none;
+  color: rgba(255, 255, 255, 0.9) !important;
   font-weight: 500;
-  padding: 8px 12px;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-}
-
-.nav-link:hover {
-  color: white;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.nav-link.router-link-active {
-  color: white;
-  background: rgba(255, 255, 255, 0.15);
-}
-
-.user-section {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-left: auto;
-}
-
-.auth-btn {
-  padding: 8px 16px;
-  border-radius: 6px;
-  text-decoration: none;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.login-btn {
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.login-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.register-btn {
-  background: white;
-  color: #667eea;
-}
-
-.register-btn:hover {
-  background: #f8f9fa;
-}
-
-.user-menu {
-  position: relative;
-}
-
-.user-btn {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 8px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s ease;
+  padding: 8px 16px !important;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  margin: 0 2px;
 }
 
-.user-btn:hover {
+.nav-link:hover {
+  color: white !important;
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.nav-link.router-link-active {
+  color: white !important;
   background: rgba(255, 255, 255, 0.2);
+  font-weight: 600;
 }
 
-.user-btn .fa-chevron-down {
-  font-size: 0.8rem;
-  transition: transform 0.2s ease;
+/* Create Recipe Link */
+.create-recipe-link {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  font-weight: 600 !important;
 }
 
-.user-btn .fa-chevron-down.rotated {
-  transform: rotate(180deg);
+.create-recipe-link:hover {
+  background: rgba(255, 255, 255, 0.25) !important;
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
-.dropdown {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  min-width: 180px;
-  margin-top: 5px;
-  overflow: hidden;
+/* Welcome Text */
+.welcome-text {
+  color: rgba(255, 255, 255, 0.8) !important;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+}
+
+/* Auth Buttons */
+.login-btn {
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 8px !important;
+}
+
+.register-btn {
+  background: white !important;
+  color: #667eea !important;
+  border: 1px solid white !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+}
+
+.register-btn:hover {
+  background: #f8f9fa !important;
+  color: #5a67d8 !important;
+  transform: translateY(-2px);
+}
+
+/* User Menu */
+.user-menu-btn {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  padding: 8px 16px !important;
+}
+
+.user-menu-btn:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.user-menu-btn::after {
+  margin-left: 8px;
+}
+
+/* Modern Dropdown */
+.modern-dropdown {
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  padding: 8px;
+  margin-top: 8px;
+  min-width: 200px;
+  z-index: 1040 !important;
+  position: absolute !important;
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .dropdown-item {
+  color: #374151;
+  font-weight: 500;
+  padding: 10px 12px;
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 12px 16px;
-  color: #4a5568;
-  text-decoration: none;
-  font-weight: 500;
-  transition: background 0.2s ease;
+  transition: all 0.15s ease;
   border: none;
-  background: none;
-  width: 100%;
-  text-align: left;
-  cursor: pointer;
+  text-decoration: none;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  margin-bottom: 2px;
 }
 
 .dropdown-item:hover {
-  background: #f7fafc;
-}
-
-.dropdown-item.logout {
-  color: #e53e3e;
-  border-top: 1px solid #e2e8f0;
-}
-
-.dropdown-item.logout:hover {
-  background: #fed7d7;
-}
-
-.separator {
-  width: 1px;
-  height: 30px;
-  background: rgba(255, 255, 255, 0.3);
-  margin: 0 10px;
-}
-
-.logout-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(255, 255, 255, 0.1);
+  background: #667eea;
   color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 8px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s ease;
+  transform: translateX(2px);
+}
+
+.dropdown-item:last-child {
+  margin-bottom: 0;
+}
+
+.dropdown-item i {
+  width: 16px;
+  text-align: center;
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
+.dropdown-item:hover i {
+  opacity: 1;
+}
+
+/* Logout Button */
+.logout-btn {
+  background: rgba(220, 53, 69, 0.1) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(220, 53, 69, 0.3) !important;
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+  padding: 8px 16px !important;
+  transition: all 0.3s ease;
 }
 
 .logout-btn:hover {
-  background: rgba(220, 53, 69, 0.2);
-  border-color: rgba(220, 53, 69, 0.4);
-  color: #ffebee;
+  background: rgba(220, 53, 69, 0.2) !important;
+  color: white !important;
+  border-color: rgba(220, 53, 69, 0.5) !important;
+  transform: translateY(-2px);
 }
 
-/* Modal */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal {
-  background: white;
-  border-radius: 12px;
-  max-width: 600px;
-  width: 90%;
-  max-height: 80vh;
+/* Modal Enhancements */
+.modern-modal {
+  border: none;
+  border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
 }
 
-.modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px;
+.gradient-header {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-}
-
-.modal-header h3 {
-  margin: 0;
-  font-size: 1.3rem;
-}
-
-.close-btn {
-  background: none;
   border: none;
   color: white;
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 0;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: background 0.2s ease;
+  padding: 24px;
 }
 
-.close-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
+.modal-title {
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
 }
 
 .modal-body {
-  padding: 20px;
-  max-height: 60vh;
-  overflow-y: auto;
+  padding: 24px;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .navbar-container {
-    padding: 0 15px;
+/* Responsive Design */
+@media (max-width: 991.98px) {
+  .navbar-brand {
+    font-size: 1.3rem;
   }
   
-  .nav-links {
-    gap: 15px;
+  .brand-icon {
+    font-size: 1.4rem;
+    padding: 6px;
   }
   
-  .nav-link span {
+  .nav-link {
+    margin: 2px 0;
+  }
+  
+  .modern-dropdown {
+    position: static !important;
+    box-shadow: none;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    margin-top: 0;
+  }
+  
+  .dropdown-item {
+    color: rgba(255, 255, 255, 0.9);
+  }
+  
+  .dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .nav-link span:not(.navbar-text span) {
     display: none;
   }
   
-  .brand-text {
-    display: none;
-  }
-  
-  .user-btn span {
+  .navbar-brand .brand-text {
     display: none;
   }
 }
