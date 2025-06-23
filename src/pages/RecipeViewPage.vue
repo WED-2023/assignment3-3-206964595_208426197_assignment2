@@ -4,13 +4,21 @@
       <!-- Recipe Header -->
       <h1>{{ recipe.title }}</h1>
       <img v-if="recipe.image" :src="recipe.image" class="recipe-image" />
-      
+
+      <!-- Buttons -->
+      <div class="actions mt-3 mb-3">
+        <button class="btn btn-outline-danger me-2" @click="likeRecipe" :disabled="liked">
+          ❤️ {{ liked ? 'Liked' : 'Like' }}
+        </button>
+      </div>
+
       <!-- Basic Info -->
       <div class="recipe-info">
         <p><strong>Ready in:</strong> {{ recipe.readyInMinutes }} minutes</p>
         <p><strong>Likes:</strong> {{ recipe.aggregateLikes || recipe.popularity || 0 }}</p>
       </div>
 
+      <!-- Recipe Content -->
       <div class="recipe-content">
         <!-- Ingredients -->
         <div class="section">
@@ -31,7 +39,6 @@
         </div>
       </div>
     </div>
-    
     <div v-else>
       <p>Loading...</p>
     </div>
@@ -42,42 +49,37 @@
 export default {
   data() {
     return {
-      recipe: null
+      recipe: null,
+      liked: false
     };
   },
   computed: {
     displayIngredients() {
       if (!this.recipe) return [];
-      
-      // Spoonacular format
+
       if (this.recipe.extendedIngredients) {
         return this.recipe.extendedIngredients.map(ing => ing.original);
       }
-      
-      // Custom format
+
       if (this.recipe.ingredients) {
-        return this.recipe.ingredients.map(ing => {
-          return `${ing.amount || ''} ${ing.unit || ''} ${ing.name || ''}`.trim();
-        });
+        return this.recipe.ingredients.map(ing =>
+          `${ing.amount || ''} ${ing.unit || ''} ${ing.name || ''}`.trim()
+        );
       }
-      
+
       return [];
     },
-    
     displayInstructions() {
       if (!this.recipe) return '';
-      
-      // Spoonacular format
+
       if (this.recipe.analyzedInstructions && this.recipe.analyzedInstructions.length) {
-        const steps = this.recipe.analyzedInstructions
+        return this.recipe.analyzedInstructions
           .map(section => section.steps || [])
           .flat()
           .map(step => step.step)
           .join(' ');
-        return steps;
       }
-      
-      // Custom format
+
       return this.recipe.instructions || '';
     }
   },
@@ -87,8 +89,9 @@ export default {
         `${this.$root.store.server_domain}/recipes/${this.$route.params.recipeId}`
       );
       this.recipe = response.data;
-      
-      // Mark as watched when user views the recipe
+
+      this.liked = this.recipe.isWatched || false;
+
       await this.markAsWatched();
     } catch (error) {
       console.error(error);
@@ -97,11 +100,7 @@ export default {
   },
   methods: {
     async markAsWatched() {
-      // Only mark as watched if user is logged in
-      if (!this.$root.store.username) {
-        return;
-      }
-      
+      if (!this.$root.store.username) return;
       try {
         await this.axios.post(
           `${this.$root.store.server_domain}/users/markwatched/${this.recipe.id}`,
@@ -110,8 +109,30 @@ export default {
         );
         console.log('Recipe marked as watched');
       } catch (error) {
-        console.error('Error marking recipe as watched:', error);
-        // Don't show error to user, this is background functionality
+        console.error('Error marking as watched:', error);
+      }
+    },
+
+    async likeRecipe() {
+      if (!this.$root.store.username) {
+        this.$router.push('/Login');
+        return;
+      }
+
+      try {
+        await this.axios.post(
+          `${this.$root.store.server_domain}/users/like/${this.recipe.id}`,
+          {},
+          { withCredentials: true }
+        );
+        this.liked = true;
+        if (this.recipe.aggregateLikes !== undefined) {
+          this.recipe.aggregateLikes += 1;
+        } else if (this.recipe.popularity !== undefined) {
+          this.recipe.popularity += 1;
+        }
+      } catch (err) {
+        console.error('Error liking recipe:', err);
       }
     }
   }
@@ -143,6 +164,10 @@ export default {
 .section h3 {
   border-bottom: 2px solid #ddd;
   padding-bottom: 10px;
+}
+
+.actions button {
+  min-width: 160px;
 }
 
 @media (max-width: 768px) {
