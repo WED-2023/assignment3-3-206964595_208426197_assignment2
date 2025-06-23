@@ -57,7 +57,7 @@ export default {
             params: {
               limitLicense: true,
               number: 3,
-              apiKey: '8ff080815b204f66a9641b65189504ee'
+              apiKey: 'af93fe3fb3e94d16a993328500f9cce5'
             }
           }
         );
