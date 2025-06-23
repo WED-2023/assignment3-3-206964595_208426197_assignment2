@@ -17,10 +17,20 @@
 
     <h2>Past Works</h2>
     <ul>
-      <li><a href="https://wed-2023.github.io/206964595/" target="_blank">Yuval's grandma's page, she's our inspiration</a></li>
-      <li><a href="https://wed-2023.github.io/assignment1-208426197/" target="_blank">check out Gidi Gov's page, did you know he's a fan of us?</a></li>
-      <li><a href="https://wed-2023.github.io/assignment2-206964595_208426197_assignment2/" target="_blank">Space Invaders, 2024 best selling game on Steam </a></li>
+        <li>
+          Yuval's grandma's page – 
+          <a href="https://wed-2023.github.io/206964595/" target="_blank">Visit here</a>
+        </li>
+        <li>
+          Check out Gidi Gov's page – 
+          <a href="https://wed-2023.github.io/assignment1-208426197/" target="_blank">Visit here</a>
+        </li>
+        <li>
+          Space Invaders (2024 best-selling game on Steam) – 
+          <a href="https://wed-2023.github.io/assignment2-206964595_208426197_assignment2/" target="_blank">Play now</a>
+        </li>
     </ul>
+
   </div>
 </template>
 
