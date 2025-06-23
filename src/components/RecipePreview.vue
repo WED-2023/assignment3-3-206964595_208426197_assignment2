@@ -47,21 +47,24 @@ export default {
   },
   computed: {
     displayTime() {
-      return this.recipe.readyInMinutes ??
-             this.recipe.cookingTime ??
-             this.recipe.preparationTime ??
+      // Handle all possible time field names
+      return this.recipe.readyInMinutes ||
+             this.recipe.Time ||
+             this.recipe.cookingTime ||
+             this.recipe.preparationTime ||
              0;
     },
     displayLikes() {
-      return Number.isFinite(this.recipe.aggregateLikes)
-        ? this.recipe.aggregateLikes
-        : (this.recipe.popularity || 0);
+      // Handle all possible likes field names
+      return this.recipe.aggregateLikes ||
+             this.recipe.popularity ||
+             0;
     }
   },
   methods: {
     async saveToFavorites() {
       if (!this.$root.store.username) {
-        this.$router.push('/Login');
+        this.$router.push('/login');
         return;
       }
 
@@ -74,6 +77,7 @@ export default {
         this.favorited = true;
       } catch (err) {
         console.error('Error saving to favorites:', err);
+        alert('Failed to save to favorites');
       }
     },
   },
@@ -89,19 +93,43 @@ export default {
 
 .recipe-card {
   margin-bottom: 20px;
-  padding: 10px;
+  padding: 15px;
   border: 1px solid #ddd;
   border-radius: 8px;
-  transition: transform 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
+  background: white;
 }
 
 .recipe-card:hover {
-  transform: scale(1.02);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .recipe-image {
   width: 100%;
   max-height: 200px;
   object-fit: cover;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+.recipe-content h4 {
+  color: #333;
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+}
+
+.recipe-content p {
+  color: #666;
+  margin-bottom: 4px;
+  font-size: 0.9rem;
+}
+
+.btn {
+  transition: all 0.2s;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
 }
 </style>

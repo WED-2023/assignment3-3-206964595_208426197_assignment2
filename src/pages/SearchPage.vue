@@ -21,7 +21,6 @@
         ></b-form-select>
       </b-form-group>
 
-
       <b-form-group label="Diet Type" label-for="diet">
         <b-form-select
           id="diet"
@@ -62,28 +61,7 @@
 
     <div v-if="recipes.length > 0" class="mt-5">
       <h4>Results:</h4>
-      <b-row>
-        <b-col
-          v-for="recipe in sortedRecipes"
-          :key="recipe.id"
-          cols="12"
-          md="6"
-          lg="4"
-          class="mb-4"
-        >
-          <b-card
-            :title="recipe.title"
-            :img-src="recipe.image"
-            img-alt="Recipe image"
-            img-top
-            @click="$router.push(`/recipes/${recipe.id}`)"
-            style="cursor: pointer"
-          >
-            <p class="mb-1"><strong>Ready in:</strong> {{ recipe.time }} minutes</p>
-            <p class="mb-1"><strong>Likes:</strong> {{ recipe.popularity }}</p>
-          </b-card>
-        </b-col>
-      </b-row>
+      <RecipePreviewList :recipes="sortedRecipes" />
     </div>
 
     <div v-else-if="searchedOnce" class="mt-4 text-danger">
@@ -93,8 +71,13 @@
 </template>
 
 <script>
+import RecipePreviewList from '../components/RecipePreviewList.vue';
+
 export default {
   name: "SearchRecipesPage",
+  components: {
+    RecipePreviewList
+  },
   data() {
     return {
       searchQuery: "",
@@ -110,9 +93,9 @@ export default {
   computed: {
     sortedRecipes() {
       if (this.sortBy === "time") {
-        return [...this.recipes].sort((a, b) => a.time - b.time);
+        return [...this.recipes].sort((a, b) => a.readyInMinutes - b.readyInMinutes);
       } else if (this.sortBy === "popularity") {
-        return [...this.recipes].sort((a, b) => b.popularity - a.popularity);
+        return [...this.recipes].sort((a, b) => b.aggregateLikes - a.aggregateLikes);
       }
       return this.recipes;
     },
@@ -134,22 +117,26 @@ export default {
                 diet: this.diet,
                 intolerances: this.intolerance,
                 cuisine: this.cuisine,
+                addRecipeInformation: true,  // This adds readyInMinutes and aggregateLikes!
                 apiKey: "af93fe3fb3e94d16a993328500f9cce5",
               },
             }
           );
 
+          console.log('Spoonacular response:', response.data.results[0]); // Debug log
+
+          // Normalize Spoonacular data to match RecipePreview expectations
           this.recipes = response.data.results.map((r) => ({
             id: r.id,
             title: r.title,
             image: r.image,
-            time: r.readyInMinutes,
-            popularity: r.aggregateLikes || 0,
+            readyInMinutes: r.readyInMinutes || 0,
+            aggregateLikes: r.aggregateLikes || 0,
           }));
         } else {
           // Fetch from your backend
           const response = await this.axios.get(
-            `http://localhost:3000/recipes/search`,
+            `${this.$root.store.server_domain}/recipes/search`,
             {
               params: {
                 query: this.searchQuery,
@@ -163,12 +150,13 @@ export default {
             }
           );
 
+          // Normalize backend data to match RecipePreview expectations
           this.recipes = response.data.map((r) => ({
             id: r.id,
             title: r.title,
             image: r.image,
-            time: r.Time,
-            popularity: r.popularity,
+            readyInMinutes: r.Time || r.readyInMinutes || 0,  // Fixed: normalize field names
+            aggregateLikes: r.popularity || r.aggregateLikes || 0,  // Fixed: normalize field names
           }));
         }
       } catch (err) {
@@ -184,7 +172,7 @@ export default {
     async checkLoginStatus() {
       try {
         const response = await this.axios.get(
-          "http://localhost:3000/users/isLoggedIn",
+          `${this.$root.store.server_domain}/users/isLoggedIn`,
           { withCredentials: true }
         );
         return response.data.loggedIn;

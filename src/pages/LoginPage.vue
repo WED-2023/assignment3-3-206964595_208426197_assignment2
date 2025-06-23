@@ -43,7 +43,7 @@ export default {
       if (await v$.value.$validate()) {
         const response = await axios({
           method: "POST",
-          url: server_domain + "/login",
+          url: server_domain + "/auth/login",
           withCredentials: true,
           validateStatus: () => true,
           data: {
