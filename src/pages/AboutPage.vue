@@ -19,7 +19,7 @@
     <ul>
       <li><a href="https://wed-2023.github.io/206964595/" target="_blank">Yuval's grandma's page, she's our inspiration</a></li>
       <li><a href="https://wed-2023.github.io/assignment1-208426197/" target="_blank">check out Gidi Gov's page, did you know he's a fan of us?</a></li>
-      <li><a href="https://wed-2023.github.io/assignment2-206964595_208426197_assignment2/" target="_blank">Space Invaders, 2024 best selling game on Steam (Portfolio)</a></li>
+      <li><a href="https://wed-2023.github.io/assignment2-206964595_208426197_assignment2/" target="_blank">Space Invaders, 2024 best selling game on Steam </a></li>
     </ul>
   </div>
 </template>
