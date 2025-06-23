@@ -29,28 +29,55 @@ export default {
   components: { RecipePreviewList },
   data() {
     return {
-      isLoggedIn: false,
       recipes: []
     };
+  },
+  computed: {
+    isLoggedIn() {
+      // Use the store to check if user is logged in
+      return !!this.$root.store.username;
+    }
+  },
+  watch: {
+    // Watch for login/logout changes
+    isLoggedIn(newValue) {
+      if (newValue) {
+        // User just logged in, load watched recipes
+        this.loadLastWatched();
+      } else {
+        // User logged out, clear recipes
+        this.recipes = [];
+      }
+    }
   },
   async mounted() {
     await this.loadLastWatched();
   },
   methods: {
     async loadLastWatched() {
+      // Only try to load if user is logged in
+      if (!this.isLoggedIn) {
+        this.recipes = [];
+        return;
+      }
+
       try {
         console.log('Loading last watched recipes...');
         const response = await this.axios.get(
           `${this.$root.store.server_domain}/users/lastWatchedRecipes`, 
-          { withCredentials: true }
+          { 
+            withCredentials: true,
+            headers: {
+              'Cache-Control': 'no-cache',
+              'Pragma': 'no-cache'
+            }
+          }
         );
         
         console.log('Last watched recipes response:', response.data);
         this.recipes = response.data || [];
-        this.isLoggedIn = true;
       } catch (err) {
         console.log('Not logged in or error fetching watched recipes:', err.response?.status);
-        this.isLoggedIn = false;
         this.recipes = [];
       }
     }
