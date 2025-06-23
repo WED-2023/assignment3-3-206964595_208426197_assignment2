@@ -50,11 +50,6 @@ const routes = [
 
   },
   {
-    path: '/create',
-    name: 'createRecipe',
-    component: () => import("../pages/CreateRecipePage.vue"),
-  },
-  {
     path: '/my-recipes',
     name: 'myRecipes',
     component: () => import("../pages/MyRecipesPage.vue"),
