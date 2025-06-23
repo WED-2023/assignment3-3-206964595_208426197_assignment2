@@ -15,7 +15,7 @@
       <!-- Basic Info -->
       <div class="recipe-info">
         <p><strong>Ready in:</strong> {{ recipe.readyInMinutes }} minutes</p>
-        <p><strong>Likes:</strong> {{ recipe.aggregateLikes || recipe.popularity || 0 }}</p>
+        <p><strong>Likes:</strong> {{ recipe.popularity || 0 }}</p>
       </div>
 
       <!-- Recipe Content -->
@@ -86,11 +86,13 @@ export default {
   async created() {
     try {
       const response = await this.axios.get(
-        `${this.$root.store.server_domain}/recipes/${this.$route.params.recipeId}`
+        `${this.$root.store.server_domain}/recipes/${this.$route.params.recipeId}`,
+        { withCredentials: true } // Make sure to send session cookie
       );
       this.recipe = response.data;
 
-      this.liked = this.recipe.isWatched || false;
+      // Set liked status based on backend data
+      this.liked = this.recipe.isLiked || false;
 
       await this.markAsWatched();
     } catch (error) {
@@ -121,18 +123,22 @@ export default {
 
       try {
         await this.axios.post(
-          `${this.$root.store.server_domain}/users/like/${this.recipe.id}`,
+          `${this.$root.store.server_domain}/recipes/${this.recipe.id}/like`,
           {},
           { withCredentials: true }
         );
+        
+        // Update local state
         this.liked = true;
-        if (this.recipe.aggregateLikes !== undefined) {
-          this.recipe.aggregateLikes += 1;
-        } else if (this.recipe.popularity !== undefined) {
-          this.recipe.popularity += 1;
-        }
+        this.recipe.popularity = (this.recipe.popularity || 0) + 1;
+        
       } catch (err) {
         console.error('Error liking recipe:', err);
+        if (err.response?.status === 409) {
+          alert('You already liked this recipe!');
+        } else {
+          alert('Failed to like recipe. Please try again.');
+        }
       }
     }
   }

@@ -78,18 +78,6 @@
           <div v-if="errors.country" class="invalid-feedback">{{ errors.country }}</div>
         </div>
 
-        <!-- Profile Picture URL -->
-        <div class="mb-3">
-          <label for="profilePic" class="form-label">Profile Picture URL</label>
-          <input 
-            v-model="form.profilePic" 
-            type="url" 
-            class="form-control"
-            id="profilePic"
-            placeholder="https://example.com/your-photo.jpg (optional)"
-          />
-        </div>
-
         <!-- Password -->
         <div class="mb-3">
           <label for="password" class="form-label">Password *</label>

@@ -41,8 +41,8 @@ export default {
     },
   },
   data() {
-    return {
-      favorited: false,
+   return {
+    favorited: this.recipe.isFavorite || false,
     };
   },
   computed: {
