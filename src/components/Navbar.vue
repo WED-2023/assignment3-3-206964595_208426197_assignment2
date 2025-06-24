@@ -2,7 +2,7 @@
   <nav class="modern-navbar navbar navbar-expand-lg px-3">
     <router-link class="navbar-brand" :to="{ name: 'main' }">
       <i class="fas fa-utensils brand-icon"></i>
-      Vue Recipes
+      Recipezz 
     </router-link>
 
     <!-- Mobile toggle button -->
