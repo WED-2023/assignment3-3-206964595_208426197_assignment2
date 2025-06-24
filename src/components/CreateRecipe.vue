@@ -499,7 +499,7 @@ export default {
         this.recipe.ingredients.splice(index, 1);
       }
     },
-    async handleSubmit() {
+   async handleSubmit() {
   if (!this.isFormValid) {
     this.showValidationErrors();
     return;
@@ -533,30 +533,30 @@ export default {
       ? "/users/family"
       : "/users/my_recipes";
 
+    
     const response = await this.axios.post(
       this.$root.store.server_domain + endpoint,
       recipeData,
-      { withCredentials: true } // ADD THIS LINE!
+      { withCredentials: true }
     );
+
+    
     
     if (response.status === 200 || response.status === 201) {
       this.$emit("recipeCreated");
       this.resetForm();
       
-      // Success message
       alert(`${this.activeTab === 'family' ? 'Family' : 'Personal'} recipe created successfully!`);
     } else {
       throw new Error('Unexpected response status');
     }
   } catch (err) {
-    console.error("Error creating recipe:", err);
+    console.error("❌ Error creating recipe:", err);
     
     let errorMessage = "Failed to create recipe. Please try again.";
     
     if (err.response?.status === 401) {
       errorMessage = "You must be logged in to create recipes. Please login and try again.";
-      // Optionally redirect to login page
-      // this.$router.push('/login');
     } else if (err.response?.data?.message) {
       errorMessage = err.response.data.message;
     } else if (err.message) {
