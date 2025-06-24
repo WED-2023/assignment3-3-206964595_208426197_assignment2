@@ -203,19 +203,30 @@ export default {
       }
 
       try {
-        await this.axios.post(
+        const response = await this.axios.post(
           `${this.$root.store.server_domain}/recipes/${this.recipe.id}/like`,
           {},
           { withCredentials: true }
         );
         
+        // Update local state
         this.liked = true;
-        this.recipe.popularity = (this.recipe.popularity || 0) + 1;
+        
+        // Update popularity from server response if available, otherwise increment locally
+        if (response.data && response.data.popularity !== undefined) {
+          this.recipe.popularity = response.data.popularity;
+        } else {
+          this.recipe.popularity = (this.recipe.popularity || 0) + 1;
+        }
+        
+        console.log('Recipe liked successfully. New popularity:', this.recipe.popularity);
         
       } catch (err) {
         console.error('Error liking recipe:', err);
         if (err.response?.status === 409) {
           alert('You already liked this recipe!');
+          // If already liked, mark as liked locally
+          this.liked = true;
         } else {
           alert('Failed to like recipe. Please try again.');
         }
