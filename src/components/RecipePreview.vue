@@ -1,5 +1,8 @@
 <template>
   <div class="recipe-card">
+    <div v-if="watched" class="watched-indicator">
+      <i class="fas fa-eye"></i> Watched
+    </div>
     <router-link :to="{ name: 'recipe', params: { recipeId: recipe.id } }" class="recipe-card-link">
       <img
         v-if="recipe.image"
@@ -41,13 +44,13 @@ export default {
     },
   },
   data() {
-   return {
-    favorited: this.recipe.isFavorite || false,
+    return {
+      favorited: this.recipe.isFavorite || false,
+      watched: this.recipe.isWatched || this.recipe.watched || false
     };
   },
   computed: {
     displayTime() {
-      // Handle all possible time field names
       return this.recipe.readyInMinutes ||
              this.recipe.Time ||
              this.recipe.cookingTime ||
@@ -55,7 +58,6 @@ export default {
              0;
     },
     displayLikes() {
-      // Handle all possible likes field names
       return this.recipe.aggregateLikes ||
              this.recipe.popularity ||
              0;
@@ -131,5 +133,18 @@ export default {
 
 .btn:hover {
   transform: translateY(-1px);
+}
+
+.watched-indicator {
+  color: #777;
+  font-size: 0.85rem;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.watched-indicator i {
+  color: #555;
 }
 </style>
