@@ -225,14 +225,25 @@ export default {
   },
   computed: {
     sortedRecipes() {
+      if (!this.recipes.length) return [];
+      
       if (this.sortBy === "time") {
-        return [...this.recipes].sort((a, b) => a.readyInMinutes - b.readyInMinutes);
+        return [...this.recipes].sort((a, b) => {
+          const timeA = a.readyInMinutes || a.Time || 0;
+          const timeB = b.readyInMinutes || b.Time || 0;
+          return timeA - timeB;
+        });
       } else if (this.sortBy === "popularity") {
-        return [...this.recipes].sort((a, b) => b.aggregateLikes - a.aggregateLikes);
+        return [...this.recipes].sort((a, b) => {
+          const likesA = a.aggregateLikes || a.popularity || 0;
+          const likesB = b.aggregateLikes || b.popularity || 0;
+          return likesB - likesA;
+        });
       }
       return this.recipes;
     },
   },
+
   methods: {
     async searchRecipes() {
       if (!this.searchQuery.trim()) return;
@@ -266,6 +277,9 @@ export default {
             image: r.image,
             readyInMinutes: r.readyInMinutes || 0,
             aggregateLikes: r.aggregateLikes || 0,
+            // Add these for consistency
+            Time: r.readyInMinutes || 0,
+            popularity: r.aggregateLikes || 0,
           }));
         } else {
           // Fetch from your backend
@@ -278,7 +292,7 @@ export default {
                 diet: this.diet,
                 intolerance: this.intolerance,
                 cuisine: this.cuisine,
-                sortBy: this.sortBy,
+                includePersonal: true, // Include personal recipes in search
               },
               withCredentials: true,
             }
@@ -290,6 +304,15 @@ export default {
             image: r.image,
             readyInMinutes: r.Time || r.readyInMinutes || 0,
             aggregateLikes: r.popularity || r.aggregateLikes || 0,
+            // Keep both field names for compatibility
+            Time: r.Time || r.readyInMinutes || 0,
+            popularity: r.popularity || r.aggregateLikes || 0,
+            // Add other fields that might be needed
+            vegan: r.vegan,
+            vegetarian: r.vegetarian,
+            glutenFree: r.glutenFree,
+            isFavorite: r.isFavorite || false,
+            isWatched: r.isWatched || false,
           }));
         }
       } catch (err) {
@@ -332,8 +355,8 @@ export default {
       this.numberOfRecipes = 5;
       this.showAdvanced = false;
     }
-  },
-};
+  }
+}
 </script>
 
 <style scoped>
