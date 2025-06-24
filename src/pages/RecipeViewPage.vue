@@ -134,53 +134,93 @@ export default {
       liked: false
     };
   },
-  computed: {
-    displayIngredients() {
-      if (!this.recipe) return [];
+computed: {
+  displayIngredients() {
+    if (!this.recipe) return [];
 
-      if (this.recipe.extendedIngredients) {
-        return this.recipe.extendedIngredients.map(ing => ing.original);
-      }
-
-      if (this.recipe.ingredients) {
-        return this.recipe.ingredients.map(ing =>
-          `${ing.amount || ''} ${ing.unit || ''} ${ing.name || ''}`.trim()
-        );
-      }
-
-      return [];
-    },
-    displayInstructions() {
-      if (!this.recipe) return '';
-
-      if (this.recipe.analyzedInstructions && this.recipe.analyzedInstructions.length) {
-        return this.recipe.analyzedInstructions
-          .map(section => section.steps || [])
-          .flat()
-          .map(step => step.step)
-          .join(' ');
-      }
-
-      return this.recipe.instructions || '';
-    },
-    hasDietaryInfo() {
-      return this.recipe && (this.recipe.vegan || this.recipe.vegetarian || this.recipe.glutenFree);
+    // For Spoonacular recipes - check if extendedIngredients exists
+    if (this.recipe.extendedIngredients && Array.isArray(this.recipe.extendedIngredients)) {
+      return this.recipe.extendedIngredients.map(ing => ing.original);
     }
-  },
-  async created() {
-    try {
-      const response = await this.axios.get(
-        `${this.$root.store.server_domain}/recipes/${this.$route.params.recipeId}`,
-        { withCredentials: true }
-      );
-      this.recipe = response.data;
-      this.liked = this.recipe.isLiked || false;
-      await this.markAsWatched();
-    } catch (error) {
-      console.error(error);
-      this.$router.push('/NotFound');
+
+    // For Personal/Family recipes - check if ingredients exists
+    if (this.recipe.ingredients) {
+      let ingredients = this.recipe.ingredients;
+      
+      // If it's a JSON string, parse it
+      if (typeof ingredients === 'string') {
+        try {
+          ingredients = JSON.parse(ingredients);
+        } catch (e) {
+          console.error('Failed to parse ingredients:', e);
+          // If parsing fails, treat it as a single ingredient
+          return [this.recipe.ingredients];
+        }
+      }
+      
+      // If it's an array
+      if (Array.isArray(ingredients)) {
+        return ingredients.map(ing => {
+          if (typeof ing === 'string') {
+            return ing;
+          }
+          // Handle object format {name, amount, unit}
+          if (ing.name) {
+            return `${ing.amount || ''} ${ing.unit || ''} ${ing.name}`.trim();
+          }
+          return String(ing);
+        });
+      }
+      
+      // If it's neither array nor string, convert to string
+      return [String(ingredients)];
     }
+
+    return [];
   },
+
+  displayInstructions() {
+    if (!this.recipe) return '';
+
+    // For Spoonacular recipes - check analyzedInstructions
+    if (this.recipe.analyzedInstructions && Array.isArray(this.recipe.analyzedInstructions) && this.recipe.analyzedInstructions.length > 0) {
+      return this.recipe.analyzedInstructions
+        .map(section => section.steps || [])
+        .flat()
+        .map((step, index) => `${index + 1}. ${step.step}`)
+        .join('\n\n');
+    }
+
+    // For Personal/Family recipes - plain text instructions
+    if (this.recipe.instructions) {
+      return this.recipe.instructions;
+    }
+
+    return '';
+  },
+
+  hasDietaryInfo() {
+    return this.recipe && (this.recipe.vegan || this.recipe.vegetarian || this.recipe.glutenFree);
+  }
+},
+ async created() {
+  try {
+    const response = await this.axios.get(
+      `${this.$root.store.server_domain}/recipes/${this.$route.params.recipeId}`,
+      { withCredentials: true }
+    );
+    this.recipe = response.data;
+    
+    // Check localStorage to see if user has already liked this recipe
+    const likedRecipes = JSON.parse(localStorage.getItem('likedRecipes') || '[]');
+    this.liked = likedRecipes.includes(this.recipe.id);
+    
+    await this.markAsWatched();
+  } catch (error) {
+    console.error(error);
+    this.$router.push('/NotFound');
+  }
+},
   methods: {
     async markAsWatched() {
       if (!this.$root.store.username) return;
@@ -196,42 +236,57 @@ export default {
       }
     },
 
-    async likeRecipe() {
-      if (!this.$root.store.username) {
-        this.$router.push('/Login');
-        return;
-      }
+async likeRecipe() {
+  if (!this.$root.store.username) {
+    this.$router.push('/Login');
+    return;
+  }
 
-      try {
-        const response = await this.axios.post(
-          `${this.$root.store.server_domain}/recipes/${this.recipe.id}/like`,
-          {},
-          { withCredentials: true }
-        );
-        
-        // Update local state
-        this.liked = true;
-        
-        // Update popularity from server response if available, otherwise increment locally
-        if (response.data && response.data.popularity !== undefined) {
-          this.recipe.popularity = response.data.popularity;
-        } else {
-          this.recipe.popularity = (this.recipe.popularity || 0) + 1;
-        }
-        
-        console.log('Recipe liked successfully. New popularity:', this.recipe.popularity);
-        
-      } catch (err) {
-        console.error('Error liking recipe:', err);
-        if (err.response?.status === 409) {
-          alert('You already liked this recipe!');
-          // If already liked, mark as liked locally
-          this.liked = true;
-        } else {
-          alert('Failed to like recipe. Please try again.');
-        }
-      }
+  if (this.liked) {
+    return; // Already liked, do nothing
+  }
+
+  try {
+    const response = await this.axios.post(
+      `${this.$root.store.server_domain}/recipes/${this.recipe.id}/like`,
+      {},
+      { withCredentials: true }
+    );
+    
+    // Update local state - set to true and never reset
+    this.liked = true;
+    
+    // Store in localStorage so it persists across page refreshes
+    const likedRecipes = JSON.parse(localStorage.getItem('likedRecipes') || '[]');
+    if (!likedRecipes.includes(this.recipe.id)) {
+      likedRecipes.push(this.recipe.id);
+      localStorage.setItem('likedRecipes', JSON.stringify(likedRecipes));
     }
+    
+    // Update popularity from server response if available, otherwise increment locally
+    if (response.data && response.data.popularity !== undefined) {
+      this.recipe.popularity = response.data.popularity;
+    } else {
+      this.recipe.popularity = (this.recipe.popularity || 0) + 1;
+    }
+    
+    console.log('Recipe liked successfully. New popularity:', this.recipe.popularity);
+    
+  } catch (err) {
+    console.error('Error liking recipe:', err);
+    if (err.response?.status === 409) {
+      // If server says already liked, mark as liked locally too
+      this.liked = true;
+      const likedRecipes = JSON.parse(localStorage.getItem('likedRecipes') || '[]');
+      if (!likedRecipes.includes(this.recipe.id)) {
+        likedRecipes.push(this.recipe.id);
+        localStorage.setItem('likedRecipes', JSON.stringify(likedRecipes));
+      }
+    } else {
+      alert('Failed to like recipe. Please try again.');
+    }
+  }
+}
   }
 };
 </script>
