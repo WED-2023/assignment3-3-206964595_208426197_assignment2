@@ -500,65 +500,74 @@ export default {
       }
     },
     async handleSubmit() {
-      if (!this.isFormValid) {
-        this.showValidationErrors();
-        return;
-      }
+  if (!this.isFormValid) {
+    this.showValidationErrors();
+    return;
+  }
 
-      this.isSubmitting = true;
+  this.isSubmitting = true;
 
-      try {
-        const cleanedIngredients = this.recipe.ingredients.filter(
-          ing => ing.name.trim()
-        );
+  try {
+    const cleanedIngredients = this.recipe.ingredients.filter(
+      ing => ing.name.trim()
+    );
 
-        let recipeData = {
-          title: this.recipe.title.trim(),
-          image: this.recipe.image,
-          readyInMinutes: this.recipe.readyInMinutes,
-          servings: this.recipe.servings,
-          ingredients: cleanedIngredients,
-          instructions: this.recipe.instructions.trim(),
-          vegan: this.recipe.vegan,
-          vegetarian: this.recipe.vegetarian,
-          glutenFree: this.recipe.glutenFree
-        };
+    let recipeData = {
+      title: this.recipe.title.trim(),
+      image: this.recipe.image,
+      readyInMinutes: this.recipe.readyInMinutes,
+      servings: this.recipe.servings,
+      ingredients: cleanedIngredients,
+      instructions: this.recipe.instructions.trim(),
+      vegan: this.recipe.vegan,
+      vegetarian: this.recipe.vegetarian,
+      glutenFree: this.recipe.glutenFree
+    };
 
-        if (this.activeTab === 'family') {
-          recipeData.recipeOwner = this.recipe.recipeOwner.trim();
-          recipeData.occasion = this.recipe.occasion.trim();
-        }
+    if (this.activeTab === 'family') {
+      recipeData.recipeOwner = this.recipe.recipeOwner.trim();
+      recipeData.occasion = this.recipe.occasion.trim();
+    }
 
-        const endpoint = this.activeTab === 'family' 
-          ? "/users/family"
-          : "/users/my_recipes";
+    const endpoint = this.activeTab === 'family' 
+      ? "/users/family"
+      : "/users/my_recipes";
 
-        const response = await this.axios.post(
-          this.$root.store.server_domain + endpoint,
-          recipeData
-        );
-        
-        if (response.status === 200 || response.status === 201) {
-          this.$emit("recipeCreated");
-          this.resetForm();
-        } else {
-          throw new Error('Unexpected response status');
-        }
-      } catch (err) {
-        console.error("Error creating recipe:", err);
-        
-        let errorMessage = "Failed to create recipe. Please try again.";
-        if (err.response?.data?.message) {
-          errorMessage = err.response.data.message;
-        } else if (err.message) {
-          errorMessage = err.message;
-        }
-        
-        alert(errorMessage);
-      } finally {
-        this.isSubmitting = false;
-      }
-    },
+    const response = await this.axios.post(
+      this.$root.store.server_domain + endpoint,
+      recipeData,
+      { withCredentials: true } // ADD THIS LINE!
+    );
+    
+    if (response.status === 200 || response.status === 201) {
+      this.$emit("recipeCreated");
+      this.resetForm();
+      
+      // Success message
+      alert(`${this.activeTab === 'family' ? 'Family' : 'Personal'} recipe created successfully!`);
+    } else {
+      throw new Error('Unexpected response status');
+    }
+  } catch (err) {
+    console.error("Error creating recipe:", err);
+    
+    let errorMessage = "Failed to create recipe. Please try again.";
+    
+    if (err.response?.status === 401) {
+      errorMessage = "You must be logged in to create recipes. Please login and try again.";
+      // Optionally redirect to login page
+      // this.$router.push('/login');
+    } else if (err.response?.data?.message) {
+      errorMessage = err.response.data.message;
+    } else if (err.message) {
+      errorMessage = err.message;
+    }
+    
+    alert(errorMessage);
+  } finally {
+    this.isSubmitting = false;
+  }
+},
     resetForm() {
       this.recipe = {
         title: "",
