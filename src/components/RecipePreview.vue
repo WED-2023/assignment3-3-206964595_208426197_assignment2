@@ -21,7 +21,7 @@
         :disabled="favorited"
         class="btn btn-sm btn-outline-primary"
       >
-        ⭐ {{ favorited ? "Saved" : "Save to Favorites" }}
+        ⭐ {{ favorited ? "Saved" : "Save" }}
       </button>
     </div>
   </div>
