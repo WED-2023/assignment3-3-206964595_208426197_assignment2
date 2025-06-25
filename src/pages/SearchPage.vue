@@ -4,7 +4,7 @@
     <div class="search-header">
       <div class="header-content">
         <div class="header-icon">
-          <i class="fas fa-search"></i>
+          <i class="fas fa-search">🔍</i>
         </div>
         <div class="header-text">
           <h1 class="page-title">Search Recipes</h1>

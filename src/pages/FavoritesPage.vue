@@ -4,7 +4,7 @@
     <div class="page-header favorites-header">
       <div class="header-content">
         <div class="header-icon favorites-icon">
-          <i class="fas fa-heart"></i>
+          <i class="fas fa-heart">⭐</i>
         </div>
         <div class="header-text">
           <h1 class="page-title">My Favorite Recipes</h1>

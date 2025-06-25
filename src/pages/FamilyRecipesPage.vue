@@ -4,7 +4,7 @@
     <div class="page-header">
       <div class="header-content">
         <div class="header-icon">
-          <i class="fas fa-users"></i>
+          <i class="fas fa-users">👨‍👩‍👧‍👦</i>
         </div>
         <div class="header-text">
           <h1 class="page-title">Family Recipes</h1>

@@ -4,7 +4,7 @@
     <div class="page-header my-recipes-header">
       <div class="header-content">
         <div class="header-icon my-recipes-icon">
-          <i class="fas fa-book"></i>
+          <i class="fas fa-book">📖</i>
         </div>
         <div class="header-text">
           <h1 class="page-title">My Recipes</h1>

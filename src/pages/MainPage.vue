@@ -36,9 +36,6 @@
         <div class="left-panel">
           <div class="section-card">
             <div class="section-header">
-              <div class="section-icon">
-                <i class="fas fa-compass"></i>
-              </div>
               <div class="section-text">
                 <h2 class="section-title">Explore New Recipes</h2>
                 <p class="section-subtitle">Discover something delicious today</p>
@@ -61,9 +58,6 @@
 
             <!-- Empty State -->
             <div v-if="exploreRecipes.length === 0 && !loading" class="empty-state">
-              <div class="empty-icon">
-                <i class="fas fa-utensils"></i>
-              </div>
               <h3>No recipes found</h3>
               <p>We couldn't load any recipes right now. Please try again later.</p>
               <button @click="loadRandomRecipes" class="retry-btn">
