@@ -43,9 +43,6 @@
               {{ familyRecipes.length }} Family Recipe{{ familyRecipes.length !== 1 ? 's' : '' }}
             </h3>
             <div class="grid-actions">
-              <button @click="refreshRecipes" class="refresh-btn" :disabled="loading">
-                <i class="fas fa-sync-alt" :class="{ 'fa-spin': loading }"></i>
-              </button>
             </div>
           </div>
           

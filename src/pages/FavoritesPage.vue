@@ -43,9 +43,6 @@
               {{ favoriteRecipes.length }} Favorite Recipe{{ favoriteRecipes.length !== 1 ? 's' : '' }}
             </h3>
             <div class="grid-actions">
-              <button @click="refreshRecipes" class="refresh-btn" :disabled="loading">
-                <i class="fas fa-sync-alt" :class="{ 'fa-spin': loading }"></i>
-              </button>
             </div>
           </div>
           
@@ -54,19 +51,25 @@
               v-for="recipe in favoriteRecipes"
               :key="recipe.id"
               :recipe="recipe"
-              :is-favorite="true"
-              :was-watched="watchedRecipes.includes(recipe.id)"
+              :show-save-button="false"
             />
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Debug Section (remove in production) -->
+    <div v-if="showDebug" class="debug-section">
+      <h4>Debug Info:</h4>
+      <p>Favorite Recipes Count: {{ favoriteRecipes.length }}</p>
+      <p>Loading: {{ loading }}</p>
+      <pre>{{ JSON.stringify(favoriteRecipes, null, 2) }}</pre>
     </div>
   </div>
 </template>
 
 <script>
 import RecipePreview from "@/components/RecipePreview.vue";
-import { getFavoriteRecipes, getLastWatchedRecipes } from "@/api/apiHelper";
 
 export default {
   name: "MyFavoritesPage",
@@ -78,6 +81,7 @@ export default {
       favoriteRecipes: [],
       watchedRecipes: [],
       loading: true,
+      showDebug: false // Set to true for debugging
     };
   },
   async created() {
@@ -87,23 +91,62 @@ export default {
     async loadFavorites() {
       this.loading = true;
       try {
-        const rawFavorites = await getFavoriteRecipes();
-        const watched = await getLastWatchedRecipes();
+        console.log("Loading favorite recipes...");
+        
+        // Direct API call instead of using apiHelper
+        const response = await this.axios.get(
+          `${this.$root.store.server_domain}/users/favorites`,
+          { withCredentials: true }
+        );
+        
+        console.log("Favorites API response:", response.data);
+        
+        if (response.data && Array.isArray(response.data)) {
+          this.favoriteRecipes = response.data.map((recipe) => ({
+            ...recipe,
+            aggregateLikes: recipe.aggregateLikes || recipe.popularity || 0,
+            isFavorite: true, // Mark as favorite since they're from favorites list
+            // Ensure consistent field names
+            readyInMinutes: recipe.readyInMinutes || recipe.Time || 0
+          }));
+          
+          console.log("Processed favorites:", this.favoriteRecipes);
+        } else {
+          console.error("Invalid favorites response format:", response.data);
+          this.favoriteRecipes = [];
+        }
 
-        this.favoriteRecipes = rawFavorites.map((recipe) => ({
-          ...recipe,
-          aggregateLikes: recipe.aggregateLikes || recipe.popularity || 0,
-        }));
-
-        this.watchedRecipes = watched.map((r) => r.id || r.recipe_id);
+        // Load watched recipes for display
+        try {
+          const watchedResponse = await this.axios.get(
+            `${this.$root.store.server_domain}/users/watched`,
+            { withCredentials: true }
+          );
+          
+          if (watchedResponse.data && Array.isArray(watchedResponse.data)) {
+            this.watchedRecipes = watchedResponse.data.map((r) => r.id || r.recipe_id);
+          }
+        } catch (watchedError) {
+          console.error("Failed to load watched recipes:", watchedError);
+          this.watchedRecipes = [];
+        }
+        
       } catch (err) {
-        console.error("Failed to load favorites or watched recipes:", err);
-        this.$root.toast('Error', 'Failed to load favorite recipes', 'danger');
+        console.error("Failed to load favorite recipes:", err);
+        
+        if (err.response?.status === 401) {
+          this.$router.push('/login');
+        } else {
+          this.$root.toast && this.$root.toast('Error', 'Failed to load favorite recipes', 'danger');
+          this.favoriteRecipes = [];
+        }
       } finally {
         this.loading = false;
       }
     },
+    
     async refreshRecipes() {
+      console.log("Refreshing favorite recipes...");
       await this.loadFavorites();
     }
   }
@@ -332,6 +375,31 @@ export default {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 30px;
+}
+
+/* Debug Section */
+.debug-section {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 20px;
+  background: #f3f4f6;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+}
+
+.debug-section h4 {
+  color: #374151;
+  margin-bottom: 10px;
+}
+
+.debug-section pre {
+  background: white;
+  padding: 15px;
+  border-radius: 5px;
+  border: 1px solid #d1d5db;
+  font-size: 12px;
+  overflow-x: auto;
+  max-height: 300px;
 }
 
 @media (max-width: 768px) {
