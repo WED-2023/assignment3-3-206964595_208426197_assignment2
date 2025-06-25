@@ -52,6 +52,35 @@
           </div>
         </div>
 
+        <!-- Dietary Information -->
+        <div v-if="hasDietaryInfo" class="dietary-info">
+          <h4 class="dietary-title">
+            <i class="fas fa-leaf"></i>
+            Dietary Information
+          </h4>
+          <div class="dietary-badges">
+            <span v-if="recipe.vegan" class="dietary-badge">Vegan</span>
+            <span v-if="recipe.vegetarian" class="dietary-badge">Vegetarian</span>
+            <span v-if="recipe.glutenFree" class="dietary-badge">Gluten Free</span>
+          </div>
+        </div>
+
+        <!-- Family Recipe Info -->
+        <div v-if="recipe.recipeOwner || recipe.occasion" class="family-info">
+          <h4 class="family-title">
+            <i class="fas fa-heart"></i>
+            Family Recipe Details
+          </h4>
+          <div class="family-details">
+            <p v-if="recipe.recipeOwner">
+              <strong>Recipe by:</strong> {{ recipe.recipeOwner }}
+            </p>
+            <p v-if="recipe.occasion">
+              <strong>Traditional occasion:</strong> {{ recipe.occasion }}
+            </p>
+          </div>
+        </div>
+
         <!-- Recipe Content -->
         <div class="recipe-content">
           <!-- Ingredients Section -->
@@ -82,35 +111,6 @@
               <p v-if="displayInstructions">{{ displayInstructions }}</p>
               <p v-else class="no-instructions">No instructions provided.</p>
             </div>
-          </div>
-        </div>
-
-        <!-- Dietary Information -->
-        <div v-if="hasDietaryInfo" class="dietary-info">
-          <h4 class="dietary-title">
-            <i class="fas fa-leaf"></i>
-            Dietary Information
-          </h4>
-          <div class="dietary-badges">
-            <span v-if="recipe.vegan" class="dietary-badge">Vegan</span>
-            <span v-if="recipe.vegetarian" class="dietary-badge">Vegetarian</span>
-            <span v-if="recipe.glutenFree" class="dietary-badge">Gluten Free</span>
-          </div>
-        </div>
-
-        <!-- Family Recipe Info -->
-        <div v-if="recipe.recipeOwner || recipe.occasion" class="family-info">
-          <h4 class="family-title">
-            <i class="fas fa-heart"></i>
-            Family Recipe Details
-          </h4>
-          <div class="family-details">
-            <p v-if="recipe.recipeOwner">
-              <strong>Recipe by:</strong> {{ recipe.recipeOwner }}
-            </p>
-            <p v-if="recipe.occasion">
-              <strong>Traditional occasion:</strong> {{ recipe.occasion }}
-            </p>
           </div>
         </div>
       </div>
@@ -380,7 +380,7 @@ export default {
 }
 
 .like-btn {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
   border: none;
   color: white;
   padding: 0.875rem 2rem;
@@ -388,7 +388,7 @@ export default {
   font-weight: 600;
   font-size: 1rem;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3);
+  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3);
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -396,8 +396,8 @@ export default {
 
 .like-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
-  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
 }
 
 .like-btn.liked {
@@ -441,6 +441,73 @@ export default {
 .no-image i {
   font-size: 3rem;
   margin-bottom: 1rem;
+}
+
+/* Dietary Info */
+.dietary-info {
+  padding: 1.5rem 2rem;
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  border-top: 1px solid #e2e8f0;
+}
+
+.dietary-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #065f46;
+  margin-bottom: 1rem;
+}
+
+.dietary-title i {
+  color: #10b981;
+}
+
+.dietary-badges {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.dietary-badge {
+  background: #10b981;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 1.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+/* Family Info */
+.family-info {
+  padding: 1.5rem 2rem;
+  background: linear-gradient(135deg, #fef7ff 0%, #f3e8ff 100%);
+  border-top: 1px solid #e2e8f0;
+}
+
+.family-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #6b21a8;
+  margin-bottom: 1rem;
+}
+
+.family-title i {
+  color: #8b5cf6;
+}
+
+.family-details p {
+  margin: 0.5rem 0;
+  color: #6b21a8;
+  font-weight: 500;
+}
+
+.family-details strong {
+  color: #581c87;
 }
 
 /* Recipe Content */
@@ -527,73 +594,6 @@ export default {
 .no-instructions {
   color: #9ca3af;
   font-style: italic;
-}
-
-/* Dietary Info */
-.dietary-info {
-  padding: 1.5rem 2rem;
-  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-  border-top: 1px solid #e2e8f0;
-}
-
-.dietary-title {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #065f46;
-  margin-bottom: 1rem;
-}
-
-.dietary-title i {
-  color: #10b981;
-}
-
-.dietary-badges {
-  display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
-
-.dietary-badge {
-  background: #10b981;
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 1.5rem;
-  font-weight: 600;
-  font-size: 0.875rem;
-}
-
-/* Family Info */
-.family-info {
-  padding: 1.5rem 2rem;
-  background: linear-gradient(135deg, #fef3f2 0%, #fecaca 100%);
-  border-top: 1px solid #e2e8f0;
-}
-
-.family-title {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #7f1d1d;
-  margin-bottom: 1rem;
-}
-
-.family-title i {
-  color: #ef4444;
-}
-
-.family-details p {
-  margin: 0.5rem 0;
-  color: #7f1d1d;
-  font-weight: 500;
-}
-
-.family-details strong {
-  color: #991b1b;
 }
 
 /* Loading State */
