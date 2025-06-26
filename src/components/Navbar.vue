@@ -63,6 +63,15 @@
         </template>
 
         <template v-else>
+          <!-- User greeting -->
+          <li class="nav-item">
+            <span class="navbar-text welcome-text">
+              <i class="fas fa-user-circle"></i>
+              Hello {{ store.username }}
+            </span>
+          </li>
+          
+          <!-- Personal Area Dropdown -->
           <li class="nav-item dropdown user-dropdown">
             <a
               class="nav-link dropdown-toggle user-menu-btn"
@@ -72,8 +81,8 @@
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              <i class="fas fa-user-circle"></i>
-              {{ store.username }}
+              <i class="fas fa-user-cog"></i>
+              Personal
             </a>
             <ul class="dropdown-menu dropdown-menu-end modern-dropdown" aria-labelledby="personalArea">
               <li>
@@ -234,6 +243,7 @@ export default {
 .navbar-toggler:focus {
   box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.25);
 }
+
 .navbar-brand {
   color: white !important;
   font-weight: 700;
@@ -304,6 +314,7 @@ export default {
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
+  font-size: 1.1rem;
 }
 
 /* Auth Buttons */
@@ -474,7 +485,12 @@ export default {
 }
 
 @media (max-width: 575.98px) {
-  .nav-link span:not(.navbar-text span) {
+  .welcome-text {
+    font-size: 1rem;
+    padding: 4px 8px;
+  }
+  
+  .welcome-text span {
     display: none;
   }
   

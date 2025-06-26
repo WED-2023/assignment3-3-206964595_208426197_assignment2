@@ -551,7 +551,7 @@ export default {
       throw new Error('Unexpected response status');
     }
   } catch (err) {
-    console.error("❌ Error creating recipe:", err);
+    console.error(" Error creating recipe:", err);
     
     let errorMessage = "Failed to create recipe. Please try again.";
     

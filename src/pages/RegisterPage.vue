@@ -249,7 +249,9 @@ export default {
 </script>
 
 <style scoped>
-/* נשמר כמו במקור – מעוצב היטב */
+/* Import Google Fonts for consistency */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+
 .register-container {
   min-height: 100vh;
   display: flex;
@@ -257,7 +259,9 @@ export default {
   justify-content: center;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 2rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
+
 .register-card {
   background: white;
   padding: 3rem;
@@ -265,6 +269,211 @@ export default {
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 500px;
+  backdrop-filter: blur(10px);
 }
-/* שאר העיצוב נשאר תקין ויפה כפי ששלחת */
+
+.register-card h2 {
+  color: #333;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 600;
+  font-size: 2rem;
+}
+
+.form-label {
+  color: #555;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  font-family: 'Inter', sans-serif;
+}
+
+.form-control {
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: #fafbfc;
+  font-family: 'Inter', sans-serif;
+}
+
+.form-control:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.15);
+  background: white;
+  transform: translateY(-1px);
+}
+
+.form-control::placeholder {
+  color: #9ca3af;
+  font-style: italic;
+}
+
+.form-text {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  font-family: 'Inter', sans-serif;
+}
+
+.invalid-feedback {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  font-family: 'Inter', sans-serif;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  font-family: 'Inter', sans-serif;
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-primary:disabled {
+  opacity: 0.7;
+  transform: none;
+  cursor: not-allowed;
+}
+
+/* Login Link Styling */
+.register-card p {
+  color: #6b7280;
+  font-size: 0.95rem;
+  margin-bottom: 0;
+  font-family: 'Inter', sans-serif;
+}
+
+.register-card a {
+  color: #667eea;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  position: relative;
+  font-family: 'Inter', sans-serif;
+}
+
+.register-card a:hover {
+  color: #5a67d8;
+  text-decoration: none !important;
+}
+
+.register-card a::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  transition: width 0.3s ease;
+}
+
+.register-card a:hover::after {
+  width: 100%;
+}
+
+/* Form Group Styling */
+.mb-3 {
+  position: relative;
+}
+
+.mb-3::before {
+  content: '';
+  position: absolute;
+  left: -10px;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 2px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.mb-3:focus-within::before {
+  opacity: 1;
+}
+
+/* Responsive Design */
+@media (max-width: 576px) {
+  .register-container {
+    padding: 1rem;
+  }
+  
+  .register-card {
+    padding: 2rem;
+  }
+  
+  .register-card h2 {
+    font-size: 1.75rem;
+  }
+}
+
+/* Animation for card appearance */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.register-card {
+  animation: slideInUp 0.6s ease-out;
+}
+
+/* Input validation states */
+.form-control:valid:not(:placeholder-shown) {
+  border-color: #10b981;
+}
+
+.form-control.is-invalid {
+  border-color: #ef4444;
+}
+
+/* Enhanced focus indicators */
+.form-control:focus {
+  outline: none;
+  position: relative;
+}
+
+/* Better visual hierarchy */
+.text-center p {
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* Link hover effects */
+.register-card a {
+  display: inline-block;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.register-card a:hover {
+  transform: translateY(-1px);
+}
+
+/* Loading spinner */
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+}
 </style>

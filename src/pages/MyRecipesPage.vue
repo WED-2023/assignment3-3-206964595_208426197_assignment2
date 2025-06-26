@@ -93,7 +93,7 @@ export default {
 
         console.log("👁 Calling getLastWatchedRecipes...");
         const watched = await getLastWatchedRecipes();
-        console.log("✅ Watched recipes received:", watched);
+        console.log(" Watched recipes received:", watched);
 
         this.myRecipes = rawRecipes.map((recipe) => ({
           ...recipe,
@@ -102,7 +102,7 @@ export default {
 
         this.watchedRecipes = watched.map((r) => r.id || r.recipe_id);
       } catch (err) {
-        console.error("❌ Failed to load my recipes:", err);
+        console.error(" Failed to load my recipes:", err);
         this.$root.toast('Error', 'Failed to load your recipes', 'danger');
       } finally {
         this.loading = false;

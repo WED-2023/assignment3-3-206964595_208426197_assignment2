@@ -63,25 +63,25 @@ export const getLastWatchedRecipes = async () => {
   return response.data;
 };
 
-// Explore - שליפת 3 מתכונים אקראיים
+// Explore 
 export const getExploreRecipes = async () => {
   const response = await api.get('/recipes/Explore');
   return response.data;
 };
 
-// Search - חיפוש מתכונים עם פרמטרים
+// Search 
 export const searchRecipes = async (params) => {
   const response = await api.get('/recipes/search', { params });
   return response.data;
 };
 
-// קבלת פרטי מתכון מלא לפי ID
+
 export const getRecipeDetails = async (recipeId) => {
   const response = await api.get(`/recipes/${recipeId}`);
   return response.data;
 };
 
-// סימון מתכון כלייק
+
 export const likeRecipe = async (recipeId) => {
   const response = await api.post(`/recipes/${recipeId}/like`);
   return response.data;
